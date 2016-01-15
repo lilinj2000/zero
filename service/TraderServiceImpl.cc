@@ -194,6 +194,74 @@ int TraderServiceImpl::orderOpenSell(const std::string& instru,
   return order_ref;
 }
 
+int TraderServiceImpl::orderOpenSellFAK(const std::string& instru,
+                                       double price, int volume)
+{
+  ZERO_TRACE <<"TraderServiceImpl::orderOpenSellFAK()" ;
+
+  ZERO_DEBUG <<"instru: " <<instru
+            <<"\t price: " <<price
+            <<"\t volume: " <<volume;
+
+  int order_ref = -1;
+
+  std::unique_ptr<CZeusingFtdcInputOrderField> req( orderField(order_ref) );
+
+  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  req->Direction = ZEUSING_FTDC_D_Sell;
+  req->LimitPrice = price;
+  req->VolumeTotalOriginal = volume;
+
+  req->TimeCondition = ZEUSING_FTDC_TC_IOC;
+  
+  try
+  {
+    orderGo( req.get() );
+  }
+  catch( ... )
+  {
+    throw std::runtime_error("order open sell FAK failed.");
+  }
+  
+  return order_ref;
+
+}
+
+int TraderServiceImpl::orderOpenSellFOK(const std::string& instru,
+                                       double price, int volume)
+{
+  ZERO_TRACE <<"TraderServiceImpl::orderOpenSellFOK()" ;
+
+  ZERO_DEBUG <<"instru: " <<instru
+            <<"\t price: " <<price
+            <<"\t volume: " <<volume;
+
+  int order_ref = -1;
+
+  std::unique_ptr<CZeusingFtdcInputOrderField> req( orderField(order_ref) );
+
+  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  req->Direction = ZEUSING_FTDC_D_Sell;
+  req->LimitPrice = price;
+  req->VolumeTotalOriginal = volume;
+
+  req->TimeCondition = ZEUSING_FTDC_TC_IOC;
+  req->VolumeCondition = ZEUSING_FTDC_VC_CV;
+
+  try
+  {
+    orderGo( req.get() );
+  }
+  catch( ... )
+  {
+    throw std::runtime_error("order open sell FOK failed.");
+  }
+  
+  return order_ref;
+
+}
+
+
 int TraderServiceImpl::orderCloseBuy(const std::string& instru,
                                      double price, int volume)
 {

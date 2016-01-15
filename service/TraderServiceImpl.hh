@@ -37,6 +37,12 @@ class TraderServiceImpl : public TraderService
   virtual int orderOpenSell(const std::string& instru,
                             double price, int volume);
 
+  virtual int orderOpenSellFAK(const std::string& instru,
+                              double price, int volume);
+
+  virtual int orderOpenSellFOK(const std::string& instru,
+                              double price, int volume);
+
   virtual int orderCloseBuy(const std::string& instru,
                             double price, int volume);
 
