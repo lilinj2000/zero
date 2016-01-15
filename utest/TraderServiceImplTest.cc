@@ -18,7 +18,7 @@ class TraderServiceImplTest : public ::testing::Test
     options_.reset( TraderService::createOptions() );
 
     std::auto_ptr<soil::Config> config( soil::Config::create() );
-    config->configFile() = "trader.cfg";
+    config->configFile() = "zero.cfg";
     config->registerOptions( options_.get() );
     config->loadConfig();
 
@@ -79,11 +79,25 @@ TEST_F(TraderServiceImplTest, orderOpenBuyFAKTest)
 TEST_F(TraderServiceImplTest, orderOpenBuyFOKTest)
 {
 
-  std::string instru = "cu1601";
-  double price = 3000;
+  std::string instru = "cu1603";
+  double price = 32660;
   int volume = 10;
   
   service_->orderOpenBuyFOK(instru, price, volume);
+
+  cond_->wait(2000);
+
+  ASSERT_TRUE(true);
+}
+
+TEST_F(TraderServiceImplTest, orderOpenSellFOKTest)
+{
+
+  std::string instru = "cu1603";
+  double price = 35330;
+  int volume = 10;
+  
+  service_->orderOpenSellFOK(instru, price, volume);
 
   cond_->wait(2000);
 
