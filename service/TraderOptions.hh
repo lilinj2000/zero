@@ -28,6 +28,13 @@ class TraderOptions : public soil::Options
 
   std::string investor_id;
 
+  bool is_auth_force;
+
+  std::string user_product_info;
+  
+  std::string auth_code;
+
+
  private:
 
   boost::program_options::options_description options_;

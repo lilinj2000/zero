@@ -79,11 +79,21 @@ TEST_F(TraderServiceImplTest, orderOpenBuyFAKTest)
 TEST_F(TraderServiceImplTest, orderOpenBuyFOKTest)
 {
 
-  std::string instru = "IF1510";
+  std::string instru = "cu1601";
   double price = 3000;
   int volume = 10;
   
   service_->orderOpenBuyFOK(instru, price, volume);
+
+  cond_->wait(2000);
+
+  ASSERT_TRUE(true);
+}
+
+TEST_F(TraderServiceImplTest, queryAccountTest)
+{
+
+  service_->queryAccount();
 
   cond_->wait(2000);
 

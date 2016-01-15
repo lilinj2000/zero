@@ -15,7 +15,7 @@ class TraderServiceCallback
   
   virtual void onRspOrderInsert(int order_ref)= 0;
 
-  virtual void onRtnOrder(int order_ref, const std::string& status_msg) = 0;
+  virtual void onRtnOrder(int order_ref, const std::string& order_status, const std::string& status_msg) = 0;
 
   virtual void onRtnTrade(int order_ref,
                           double price, int volume)= 0;
@@ -48,6 +48,8 @@ class TraderService
   virtual int orderCloseSell(const std::string& instru,
                             double price, int volume) = 0;
 
+  virtual int queryAccount() = 0;
+  
   virtual ~TraderService() {}
 
   static soil::Options* createOptions();

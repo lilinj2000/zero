@@ -25,7 +25,12 @@ TraderOptions::TraderOptions():
        "password")
       ("zero_trader.investor_id", po::value<std::string>(&investor_id), 
        "investor_id")
-
+      ("zero_trader.is_auth_force", po::value<bool>(&is_auth_force),
+       "is auth force")
+      ("zero_trader.user_product_info", po::value<std::string>(&user_product_info), 
+       "user product info")
+      ("zero_trader.auth_code", po::value<std::string>(&auth_code), 
+       "auth code")
       ;
 
   return;

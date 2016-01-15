@@ -29,4 +29,5 @@ unittest_LDFLAGS = $(LIBADD_DL) -Wl,--no-as-needed -pthread
 # header files
 noinst_HEADERS = 
 
+EXTRA_DIST = env.sh trader.cfg log.cfg
 

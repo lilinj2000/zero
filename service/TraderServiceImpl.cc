@@ -258,12 +258,58 @@ int TraderServiceImpl::orderCloseSell(const std::string& instru,
 
 }
 
+int TraderServiceImpl::queryAccount()
+{
+  ZERO_TRACE <<"TraderServiceImpl::queryAccount()" ;
+
+  CZeusingFtdcQryTradingAccountField req;
+  memset(&req, 0x0, sizeof(req));
+  
+  strncpy( req.BrokerID, options_->broker_id.data(), sizeof(req.BrokerID) );
+  strncpy( req.InvestorID, options_->investor_id.data(), sizeof(req.InvestorID) );
+
+  ZERO_PDU <<req;
+  
+  int result = trader_api_->ReqQryTradingAccount(&req, ++request_id_);
+
+  if( result!=0 )
+  {
+    ZERO_ERROR <<"return code " <<result;
+    throw std::runtime_error("query account failed.");
+  }
+
+}
+
 void TraderServiceImpl::initSession(CZeusingFtdcRspUserLoginField* pRspUserLogin)
 {
   front_id_ = pRspUserLogin->FrontID;
   session_id_ = pRspUserLogin->SessionID;
 
   max_order_ref_ = atoi(pRspUserLogin->MaxOrderRef);
+}
+
+void TraderServiceImpl::authenticate()
+{
+  ZERO_TRACE <<"TraderServiceImpl::authenticate()" ;
+
+  CZeusingFtdcReqAuthenticateField req;
+  memset(&req, 0x0, sizeof(req));
+  
+  strncpy( req.BrokerID, options_->broker_id.data(), sizeof(req.BrokerID) );
+  strncpy( req.UserID, options_->user_id.data(), sizeof(req.UserID) );
+  strncpy( req.UserProductInfo, options_->user_product_info.data(), sizeof(req.UserProductInfo) );
+  strncpy( req.AuthCode, options_->auth_code.data(), sizeof(req.AuthCode) );
+
+  ZERO_PDU <<req;
+  
+  int result = trader_api_->ReqAuthenticate(&req, ++request_id_);
+
+  if( result!=0 )
+  {
+    ZERO_ERROR <<"return code " <<result;
+    throw std::runtime_error("authenticate failed.");
+  }
+
 }
 
 void TraderServiceImpl::login()
@@ -276,6 +322,7 @@ void TraderServiceImpl::login()
   strncpy( req.BrokerID, options_->broker_id.data(), sizeof(req.BrokerID) );
   strncpy( req.UserID, options_->user_id.data(), sizeof(req.UserID) );
   strncpy( req.Password, options_->password.data(), sizeof(req.Password) );
+  strncpy( req.UserProductInfo, options_->user_product_info.data(), sizeof(req.UserProductInfo) );
 
   ZERO_PDU <<req;
   

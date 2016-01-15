@@ -42,7 +42,11 @@ class TraderServiceImpl : public TraderService
 
   virtual int orderCloseSell(const std::string& instru,
                             double price, int volume);
-
+  
+  virtual int queryAccount();
+  
+  void authenticate();
+  
   void login();
 
   void settlementInfoConfirm();
@@ -54,6 +58,8 @@ class TraderServiceImpl : public TraderService
   void notify();
 
   TraderServiceCallback* callback() { return callback_; }
+
+  TraderOptions* options() { return options_; }
   
  protected:
 

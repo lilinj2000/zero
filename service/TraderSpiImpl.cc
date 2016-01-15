@@ -1,5 +1,6 @@
 #include "TraderSpiImpl.hh"
 #include "TraderServiceImpl.hh"
+#include "TraderOptions.hh"
 #include "ZeroLog.hh"
 
 #include "ZeusingFtdcUserApiStructPrint.hh"
@@ -25,7 +26,14 @@ void TraderSpiImpl::OnFrontConnected()
 {
   ZERO_TRACE <<"TraderSpiImpl::OnFrontConnected()" ;
 
-  service_->login();
+  if( service_->options()->is_auth_force )
+  {
+    service_->authenticate();
+  }
+  else
+  {
+    service_->login();
+  }
 }
 
 void TraderSpiImpl::OnFrontDisconnected(int nReason)
@@ -42,6 +50,27 @@ void TraderSpiImpl::OnHeartBeatWarning(int nTimeLapse)
   ZERO_INFO <<"OnHeartBeatWarning, the time lapse is "<<nTimeLapse ;
 }
 
+void TraderSpiImpl::OnRspAuthenticate(CZeusingFtdcRspAuthenticateField *pRspAuthenticateField, CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+  ZERO_TRACE <<"TraderSpiImpl::OnRspAuthenticate()" ;
+
+  try
+  {
+    checkRspInfo(pRspInfo);
+    
+    ZERO_PDU <<*pRspAuthenticateField;
+
+                          
+    if( bIsLast )
+      service_->login();
+
+  }
+  catch( ... )
+  {
+  }
+  
+  
+}
 
 void TraderSpiImpl::OnRspUserLogin(CZeusingFtdcRspUserLoginField *pRspUserLogin,
                            CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -79,6 +108,22 @@ void TraderSpiImpl::OnRspSettlementInfoConfirm(CZeusingFtdcSettlementInfoConfirm
     if( bIsLast )
       service_->notify();
 
+  }
+  catch( ... )
+  {
+  }
+
+}
+
+void TraderSpiImpl::OnRspQryTradingAccount(CZeusingFtdcTradingAccountField *pTradingAccount, CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+  ZERO_TRACE <<"TraderSpiImpl::OnRspQryTradingAccount()" ;
+
+  try
+  {
+    checkRspInfo(pRspInfo);
+    
+    ZERO_PDU <<*pTradingAccount;
   }
   catch( ... )
   {
@@ -130,9 +175,11 @@ void TraderSpiImpl::OnRtnOrder(CZeusingFtdcOrderField *pOrder)
   {
     int order_ref = atoi(pOrder->OrderRef);
 
+    std::string order_status;
+    order_status.push_back(pOrder->OrderStatus);
     std::string status_msg = pOrder->StatusMsg;
     
-    service_->callback()->onRtnOrder( order_ref, status_msg );
+    service_->callback()->onRtnOrder( order_ref, order_status, status_msg );
   }
 
   
