@@ -445,7 +445,7 @@ CZeusingFtdcInputOrderField* TraderServiceImpl::orderField(int& order_ref)
 {
   std::unique_ptr<CZeusingFtdcInputOrderField> req( new CZeusingFtdcInputOrderField() );
 
-  order_ref = max_order_ref_++;
+  order_ref = ++max_order_ref_;
   
   strncpy(req->BrokerID, options_->broker_id.data(), sizeof(req->BrokerID));
   strncpy(req->InvestorID, options_->investor_id.data(), sizeof(req->InvestorID));
