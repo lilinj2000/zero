@@ -12,6 +12,7 @@ namespace zero
 TraderServiceImpl::TraderServiceImpl(soil::Options* options, TraderServiceCallback* callback) :
     trader_api_(NULL),
     callback_(callback),
+    request_id_(0),
     front_id_(-1),
     session_id_(-1),
     max_order_ref_(-1)
