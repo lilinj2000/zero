@@ -144,24 +144,19 @@ void TraderSpiImpl::OnRspOrderInsert(CZeusingFtdcInputOrderField *pInputOrder, C
 {
   ZERO_TRACE <<"TraderSpiImpl::OnRspOrderInsert()" ;
 
-  try
-  {
+  try {
     checkRspInfo(pRspInfo);
-    
+  } catch (std::exception& e) {
+    ZERO_ERROR <<e.what();
+  }
+
+  if (pInputOrder && service_->callback()) {
     ZERO_PDU <<*pInputOrder;
 
-    if( service_->callback() )
-    {
-      int order_ref = atoi(pInputOrder->OrderRef);
+    int order_ref = std::stoi(pInputOrder->OrderRef);
       
-      service_->callback()->onRspOrderInsert( order_ref );
-    }
-
+    service_->callback()->onRspOrderInsert( order_ref );
   }
-  catch( ... )
-  {
-  }
-
 }
 
 void TraderSpiImpl::OnRtnOrder(CZeusingFtdcOrderField *pOrder)
