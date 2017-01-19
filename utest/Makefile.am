@@ -2,7 +2,9 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = traderflow
 
-noinst_PROGRAMS = unittest
+TESTS = unittest.sh
+
+check_PROGRAMS = unittest
 
 unittest_SOURCES = \
 	TraderServiceImplTest.cc
