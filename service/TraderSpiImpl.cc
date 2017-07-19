@@ -1,148 +1,141 @@
+// Copyright (c) 2010
+// All rights reserved.
+
 #include "TraderSpiImpl.hh"
 #include "TraderServiceImpl.hh"
 #include "TraderOptions.hh"
-#include "ZeroLog.hh"
+#include "Log.hh"
 
 #include "ZeusingFtdcUserApiStructPrint.hh"
 
-namespace zero
-{
+namespace zero {
 
 TraderSpiImpl::TraderSpiImpl(TraderServiceImpl* service) :
-    service_(service)
-{
-  ZERO_TRACE <<"TraderSpiImpl::TraderSpiImpl()" ;
+    service_(service) {
+  ZERO_TRACE <<"TraderSpiImpl::TraderSpiImpl()";
 }
 
-TraderSpiImpl::~TraderSpiImpl()
-{
-  ZERO_TRACE <<"TraderSpiImpl::~TraderSpiImpl()" ;
+TraderSpiImpl::~TraderSpiImpl() {
+  ZERO_TRACE <<"TraderSpiImpl::~TraderSpiImpl()";
 }
 
 /////////////////////////////////////////
 // impl from CZeusingFtdcSpi
 /////////////////////////////////////////
-void TraderSpiImpl::OnFrontConnected()
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnFrontConnected()" ;
+void TraderSpiImpl::OnFrontConnected() {
+  ZERO_TRACE <<"TraderSpiImpl::OnFrontConnected()";
 
-  if( service_->options()->is_auth_force )
-  {
+  if (service_->options()->is_auth_force) {
     service_->authenticate();
-  }
-  else
-  {
+  } else {
     service_->login();
   }
 }
 
-void TraderSpiImpl::OnFrontDisconnected(int nReason)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnFrontDisconnected()" ;
+void TraderSpiImpl::OnFrontDisconnected(int nReason) {
+  ZERO_TRACE <<"TraderSpiImpl::OnFrontDisconnected()";
 
-  ZERO_INFO <<"OnFrontDisconnected, the Reason is " <<std::hex <<nReason ;
+  ZERO_INFO <<"OnFrontDisconnected, the Reason is " <<std::hex <<nReason;
 }
 
-void TraderSpiImpl::OnHeartBeatWarning(int nTimeLapse)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnHeartBeatWarning()" ;
+void TraderSpiImpl::OnHeartBeatWarning(int nTimeLapse) {
+  ZERO_TRACE <<"TraderSpiImpl::OnHeartBeatWarning()";
 
-  ZERO_INFO <<"OnHeartBeatWarning, the time lapse is "<<nTimeLapse ;
+  ZERO_INFO <<"OnHeartBeatWarning, the time lapse is "
+            <<nTimeLapse;
 }
 
-void TraderSpiImpl::OnRspAuthenticate(CZeusingFtdcRspAuthenticateField *pRspAuthenticateField, CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRspAuthenticate()" ;
+void TraderSpiImpl::OnRspAuthenticate(
+    CZeusingFtdcRspAuthenticateField *pRspAuthenticateField,
+    CZeusingFtdcRspInfoField *pRspInfo,
+    int nRequestID,
+    bool bIsLast) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRspAuthenticate()";
 
-  try
-  {
+  try {
     checkRspInfo(pRspInfo);
-    
+
     ZERO_PDU <<*pRspAuthenticateField;
 
-                          
-    if( bIsLast )
+    if (bIsLast) {
       service_->login();
-
+    }
+  } catch (...) {
   }
-  catch( ... )
-  {
-  }
-  
-  
 }
 
-void TraderSpiImpl::OnRspUserLogin(CZeusingFtdcRspUserLoginField *pRspUserLogin,
-                           CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRspUserLogin()" ;
+void TraderSpiImpl::OnRspUserLogin(
+    CZeusingFtdcRspUserLoginField *pRspUserLogin,
+    CZeusingFtdcRspInfoField *pRspInfo,
+    int nRequestID,
+    bool bIsLast) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRspUserLogin()";
 
-  try
-  {
+  try {
     checkRspInfo(pRspInfo);
-    
+
     ZERO_PDU <<*pRspUserLogin;
 
-    service_->initSession( pRspUserLogin );
-                          
-    if( bIsLast )
-      service_->notify();
+    service_->initSession(pRspUserLogin);
 
+    if (bIsLast) {
+      service_->notify();
+    }
+  } catch (...) {
   }
-  catch( ... )
-  {
-  }
-  
 }
 
-void TraderSpiImpl::OnRspSettlementInfoConfirm(CZeusingFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRspSettlementInfoConfirm()" ;
+void TraderSpiImpl::OnRspSettlementInfoConfirm(
+    CZeusingFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
+    CZeusingFtdcRspInfoField *pRspInfo,
+    int nRequestID,
+    bool bIsLast) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRspSettlementInfoConfirm()";
 
-  try
-  {
+  try {
     checkRspInfo(pRspInfo);
-    
+
     ZERO_PDU <<*pSettlementInfoConfirm;
 
-    if( bIsLast )
+    if (bIsLast) {
       service_->notify();
-
+    }
+  } catch (...) {
   }
-  catch( ... )
-  {
-  }
-
 }
 
-void TraderSpiImpl::OnRspQryTradingAccount(CZeusingFtdcTradingAccountField *pTradingAccount, CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRspQryTradingAccount()" ;
+void TraderSpiImpl::OnRspQryTradingAccount(
+    CZeusingFtdcTradingAccountField *pTradingAccount,
+    CZeusingFtdcRspInfoField *pRspInfo,
+    int nRequestID,
+    bool bIsLast) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRspQryTradingAccount()";
 
-  try
-  {
+  try {
     checkRspInfo(pRspInfo);
-    
+
     ZERO_PDU <<*pTradingAccount;
+  } catch (...) {
   }
-  catch( ... )
-  {
-  }
-
 }
 
-void TraderSpiImpl::OnRspError(CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRspError()" ;
+void TraderSpiImpl::OnRspError(
+    CZeusingFtdcRspInfoField *pRspInfo,
+    int nRequestID,
+    bool bIsLast) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRspError()";
 
-  if( pRspInfo )
+  if (pRspInfo) {
     ZERO_PDU <<*pRspInfo;
-  
+  }
 }
 
-void TraderSpiImpl::OnRspOrderInsert(CZeusingFtdcInputOrderField *pInputOrder, CZeusingFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRspOrderInsert()" ;
+void TraderSpiImpl::OnRspOrderInsert(
+    CZeusingFtdcInputOrderField *pInputOrder,
+    CZeusingFtdcRspInfoField *pRspInfo,
+    int nRequestID,
+    bool bIsLast) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRspOrderInsert()";
 
   try {
     checkRspInfo(pRspInfo);
@@ -154,87 +147,75 @@ void TraderSpiImpl::OnRspOrderInsert(CZeusingFtdcInputOrderField *pInputOrder, C
     ZERO_PDU <<*pInputOrder;
 
     int order_ref = std::stoi(pInputOrder->OrderRef);
-      
-    service_->callback()->onRspOrderInsert( order_ref );
+    service_->callback()->onRspOrderInsert(order_ref);
   }
 }
 
-void TraderSpiImpl::OnRtnOrder(CZeusingFtdcOrderField *pOrder)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRtnOrder()" ;
+void TraderSpiImpl::OnRtnOrder(CZeusingFtdcOrderField *pOrder) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRtnOrder()";
 
-  if( pOrder )
+  if (pOrder) {
     ZERO_PDU <<*pOrder;
+  }
 
-  if( service_->callback() )
-  {
-    int order_ref = atoi(pOrder->OrderRef);
+  if (service_->callback()) {
+    int order_ref = std::stoi(pOrder->OrderRef);
 
     std::string order_status;
     order_status.push_back(pOrder->OrderStatus);
     std::string status_msg = pOrder->StatusMsg;
-    
-    service_->callback()->onRtnOrder( order_ref, order_status, status_msg );
-  }
 
-  
+    service_->callback()->onRtnOrder(order_ref, order_status, status_msg);
+  }
 }
 
-void TraderSpiImpl::OnRtnTrade(CZeusingFtdcTradeField *pTrade)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OnRtnTrade()" ;
+void TraderSpiImpl::OnRtnTrade(CZeusingFtdcTradeField *pTrade) {
+  ZERO_TRACE <<"TraderSpiImpl::OnRtnTrade()";
 
-  if( pTrade )
+  if (pTrade) {
     ZERO_PDU <<*pTrade;
+  }
 
-  if( service_->callback() )
-  {
-    int order_ref = atoi(pTrade->OrderRef);
+  if (service_->callback()) {
+    int order_ref = std::stoi(pTrade->OrderRef);
 
     double price = pTrade->Price;
     double volume = pTrade->Volume;
-    
-    service_->callback()->onRtnTrade( order_ref, price, volume );
-  }
 
+    service_->callback()->onRtnTrade(order_ref, price, volume);
+  }
 }
 
-void TraderSpiImpl::OnErrRtnOrderInsert(CZeusingFtdcInputOrderField *pInputOrder, CZeusingFtdcRspInfoField *pRspInfo)
-{
-  ZERO_TRACE <<"TraderSpiImpl::OneErrRtnOrderInsert()" ;
+void TraderSpiImpl::OnErrRtnOrderInsert(
+    CZeusingFtdcInputOrderField *pInputOrder,
+    CZeusingFtdcRspInfoField *pRspInfo) {
+  ZERO_TRACE <<"TraderSpiImpl::OneErrRtnOrderInsert()";
 
-  try
-  {
+  try {
     checkRspInfo(pRspInfo);
-    
+
     ZERO_PDU <<*pInputOrder;
-
+  } catch (...) {
   }
-  catch( ... )
-  {
-  }
-
 }
 
-void TraderSpiImpl::checkRspInfo(CZeusingFtdcRspInfoField *pRspInfo)
-{
-  ZERO_TRACE <<"TraderSpiImpl::checkRspInfo()" ;
+void TraderSpiImpl::checkRspInfo(CZeusingFtdcRspInfoField *pRspInfo) {
+  ZERO_TRACE <<"TraderSpiImpl::checkRspInfo()";
 
-  if( pRspInfo )
-    ZERO_PDU <<*pRspInfo ;
-  
+  if (pRspInfo) {
+    ZERO_PDU <<*pRspInfo;
+  }
+
   bool result = ((pRspInfo) && (pRspInfo->ErrorID != 0));
-  
-  if (result)
-  {
+
+  if (result) {
     std::stringstream err_stream;
     err_stream <<"ErrorID=" <<pRspInfo->ErrorID <<","
                <<"ErrorMsg=" <<pRspInfo->ErrorMsg;
 
     throw std::runtime_error(err_stream.str());
   }
-  
 }
 
 
-} // namespace zero
+}  // namespace zero

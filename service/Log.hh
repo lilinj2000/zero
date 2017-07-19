@@ -1,3 +1,6 @@
+// Copyright (c) 2010
+// All rights reserved.
+
 #ifndef ZERO_LOG_HH
 #define ZERO_LOG_HH
 

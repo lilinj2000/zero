@@ -24,7 +24,7 @@ noinst_HEADERS = \
 	TraderOptions.hh \
 	TraderServiceImpl.hh \
 	TraderSpiImpl.hh \
-	ZeroLog.hh \
+	Log.hh \
 	ZeusingFtdcUserApiStructPrint.hh
 
 
