@@ -5,6 +5,7 @@
 #include "Log.hh"
 #include "TraderOptions.hh"
 #include "TraderSpiImpl.hh"
+#include "soil/Macro.hh"
 
 #include "ZeusingFtdcUserApiStructPrint.hh"
 
@@ -72,7 +73,10 @@ int TraderServiceImpl::orderOpenBuy(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Buy;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -99,7 +103,10 @@ int TraderServiceImpl::orderOpenBuyFAK(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Buy;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -128,7 +135,10 @@ int TraderServiceImpl::orderOpenBuyFOK(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Buy;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -158,7 +168,10 @@ int TraderServiceImpl::orderOpenSell(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Sell;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -185,7 +198,10 @@ int TraderServiceImpl::orderOpenSellFAK(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Sell;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -214,7 +230,10 @@ int TraderServiceImpl::orderOpenSellFOK(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Sell;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -244,7 +263,10 @@ int TraderServiceImpl::orderCloseBuy(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Buy;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -272,7 +294,10 @@ int TraderServiceImpl::orderCloseSell(
 
   std::unique_ptr<CZeusingFtdcInputOrderField> req(orderField(&order_ref));
 
-  strncpy(req->InstrumentID, instru.data(), sizeof(req->InstrumentID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InstrumentID,
+          instru.data());
   req->Direction = ZEUSING_FTDC_D_Sell;
   req->LimitPrice = price;
   req->VolumeTotalOriginal = volume;
@@ -293,8 +318,14 @@ int TraderServiceImpl::queryAccount() {
   CZeusingFtdcQryTradingAccountField req;
   memset(&req, 0x0, sizeof(req));
 
-  strncpy(req.BrokerID, options_->broker_id.data(), sizeof(req.BrokerID));
-  strncpy(req.InvestorID, options_->investor_id.data(), sizeof(req.InvestorID));
+  S_INPUT(&req,
+          CZeusingFtdcQryTradingAccountField,
+          BrokerID,
+          options_->broker_id.data());
+  S_INPUT(&req,
+          CZeusingFtdcQryTradingAccountField,
+          InvestorID,
+          options_->investor_id.data());
 
   ZERO_PDU <<req;
 
@@ -320,12 +351,22 @@ void TraderServiceImpl::authenticate() {
   CZeusingFtdcReqAuthenticateField req;
   memset(&req, 0x0, sizeof(req));
 
-  strncpy(req.BrokerID, options_->broker_id.data(), sizeof(req.BrokerID));
-  strncpy(req.UserID, options_->user_id.data(), sizeof(req.UserID));
-  strncpy(req.UserProductInfo,
-          options_->user_product_info.data(),
-          sizeof(req.UserProductInfo));
-  strncpy(req.AuthCode, options_->auth_code.data(), sizeof(req.AuthCode));
+  S_INPUT(&req,
+          CZeusingFtdcReqAuthenticateField,
+          BrokerID,
+          options_->broker_id.data());
+  S_INPUT(&req,
+          CZeusingFtdcReqAuthenticateField,
+          UserID,
+          options_->user_id.data());
+  S_INPUT(&req,
+          CZeusingFtdcReqAuthenticateField,
+          UserProductInfo,
+          options_->user_product_info.data());
+  S_INPUT(&req,
+          CZeusingFtdcReqAuthenticateField,
+          AuthCode,
+          options_->auth_code.data());
 
   ZERO_PDU <<req;
 
@@ -342,12 +383,22 @@ void TraderServiceImpl::login() {
   CZeusingFtdcReqUserLoginField req;
   memset(&req, 0x0, sizeof(req));
 
-  strncpy(req.BrokerID, options_->broker_id.data(), sizeof(req.BrokerID));
-  strncpy(req.UserID, options_->user_id.data(), sizeof(req.UserID));
-  strncpy(req.Password, options_->password.data(), sizeof(req.Password));
-  strncpy(req.UserProductInfo,
-          options_->user_product_info.data(),
-          sizeof(req.UserProductInfo));
+  S_INPUT(&req,
+          CZeusingFtdcReqUserLoginField,
+          BrokerID,
+          options_->broker_id.data());
+  S_INPUT(&req,
+          CZeusingFtdcReqUserLoginField,
+          UserID,
+          options_->user_id.data());
+  S_INPUT(&req,
+          CZeusingFtdcReqUserLoginField,
+          Password,
+          options_->password.data());
+  S_INPUT(&req,
+          CZeusingFtdcReqUserLoginField,
+          UserProductInfo,
+          options_->user_product_info.data());
 
   ZERO_PDU <<req;
 
@@ -365,8 +416,14 @@ void TraderServiceImpl::settlementInfoConfirm() {
   CZeusingFtdcSettlementInfoConfirmField req;
   memset(&req, 0x0, sizeof(req));
 
-  strncpy(req.BrokerID, options_->broker_id.data(), sizeof(req.BrokerID));
-  strncpy(req.InvestorID, options_->investor_id.data(), sizeof(req.InvestorID));
+  S_INPUT(&req,
+          CZeusingFtdcSettlementInfoConfirmField,
+          BrokerID,
+          options_->broker_id.data());
+  S_INPUT(&req,
+          CZeusingFtdcSettlementInfoConfirmField,
+          InvestorID,
+          options_->investor_id.data());
 
   ZERO_PDU <<req;
 
@@ -396,16 +453,26 @@ CZeusingFtdcInputOrderField* TraderServiceImpl::orderField(int* order_ref) {
 
   *order_ref = ++max_order_ref_;
 
-  strncpy(req->BrokerID, options_->broker_id.data(), sizeof(req->BrokerID));
-  strncpy(req->InvestorID,
-          options_->investor_id.data(),
-          sizeof(req->InvestorID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          BrokerID,
+          options_->broker_id.data());
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          InvestorID,
+          options_->investor_id.data());
 
   char OrderRef[13];
   snprintf(OrderRef, sizeof(OrderRef), "%d", *order_ref);
-  strncpy(req->OrderRef, OrderRef, sizeof(req->OrderRef));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          OrderRef,
+          OrderRef);
 
-  strncpy(req->UserID, options_->user_id.data(), sizeof(req->UserID));
+  S_INPUT(req.get(),
+          CZeusingFtdcInputOrderField,
+          UserID,
+          options_->user_id.data());
   req->OrderPriceType = ZEUSING_FTDC_OPT_LimitPrice;
 
   // req->CombOffsetFlag[0] = ZEUSING_FTDC_OF_Open;
